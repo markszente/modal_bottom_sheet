@@ -162,7 +162,9 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
       widget.animationController.value < widget.closeProgressThreshold;
 
   void _close() {
-    isDragging = false;
+    setState(() {
+      isDragging = false;
+    });
     widget.onClosing();
   }
 
@@ -195,7 +197,9 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
     assert(widget.enableDrag, 'Dragging is disabled');
 
     if (_dismissUnderway) return;
-    isDragging = true;
+    setState(() {
+      isDragging = true;
+    });
 
     final progress = primaryDelta / (_childHeight ?? primaryDelta);
 
@@ -231,7 +235,9 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
     );
 
     if (_dismissUnderway || !isDragging) return;
-    isDragging = false;
+    setState(() {
+      isDragging = false;
+    });
     // ignore: unawaited_futures
     _bounceDragController.reverse();
 
@@ -357,7 +363,8 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
       curve: Curves.easeOutSine,
     );
 
-    var child = widget.child;
+    Widget child =
+        BottomSheetDragging(isDragging: isDragging, child: widget.child);
     if (widget.containerBuilder != null) {
       child = widget.containerBuilder!(
         context,
@@ -499,4 +506,28 @@ PointerDeviceKind defaultPointerDeviceKind(BuildContext context) {
     case TargetPlatform.fuchsia:
       return PointerDeviceKind.unknown;
   }
+}
+
+class BottomSheetDragging extends InheritedWidget {
+  const BottomSheetDragging({
+    super.key,
+    required this.isDragging,
+    required super.child,
+  });
+
+  final bool isDragging;
+
+  static BottomSheetDragging? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<BottomSheetDragging>();
+  }
+
+  static BottomSheetDragging of(BuildContext context) {
+    final BottomSheetDragging? result = maybeOf(context);
+    assert(result != null, 'No FrogColor found in context');
+    return result!;
+  }
+
+  @override
+  bool updateShouldNotify(BottomSheetDragging oldWidget) =>
+      isDragging != oldWidget.isDragging;
 }
