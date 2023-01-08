@@ -404,7 +404,16 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
                           _handleScrollUpdate(notification);
                           return false;
                         },
-                        child: child!,
+                        child: NotificationListener<
+                                OverscrollIndicatorNotification>(
+                            onNotification:
+                                (OverscrollIndicatorNotification notification) {
+                              if (notification.leading && widget.enableDrag) {
+                                notification.disallowIndicator();
+                              }
+                              return false;
+                            },
+                            child: child!),
                       ),
                     ),
                   ),
