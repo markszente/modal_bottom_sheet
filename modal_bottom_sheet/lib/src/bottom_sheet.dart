@@ -254,7 +254,7 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
     }
 
     // If speed is bigger than _minFlingVelocity try to close it
-    if (velocity > widget.minFlingVelocity) {
+    if (velocity.abs() > widget.minFlingVelocity) {
       tryClose();
     } else if (hasReachedCloseThreshold) {
       if (widget.animationController.value > 0.0) {
@@ -333,8 +333,7 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
       final velocityTracker = _velocityTracker!;
       if (dragDetails != null) {
         final duration = startTime.difference(DateTime.now());
-        final position =
-            dragDetails.delta.dy / widget.animationController.value;
+        final position = dragDetails.globalPosition.dy;
         velocityTracker.addPosition(duration, Offset(0, position));
         _handleDragUpdate(dragDetails.delta.dy);
       } else if (isDragging) {
